@@ -1,0 +1,14 @@
+# Temporales del generador de atlas
+framer/_tmp/
+__pycache__/
+*.pyc
+
+# Atlas del banco de pruebas: 5 MB de versiones descartadas que se regeneran
+# con framer/build_atlas.py. El HTML del banco si se conserva, que es lo que
+# documenta las tres tecnicas que comparamos.
+bench/*.webp
+
+# Sistema
+Thumbs.db
+desktop.ini
+.DS_Store

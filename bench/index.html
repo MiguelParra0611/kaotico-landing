@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Banco de pruebas — el perro sigue el cursor</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --line:#2b3440;
+    --ink:#e6edf3; --dim:#8b949e; --ok:#3fb950; --bad:#f85149; --warn:#d29922;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font:14px/1.5 ui-sans-serif,system-ui,-apple-system,Segoe UI,sans-serif;
+    overflow:hidden;
+  }
+  header{padding:14px 20px 10px; border-bottom:1px solid var(--line)}
+  h1{margin:0 0 4px; font-size:15px; font-weight:650; letter-spacing:.2px}
+  header p{margin:0; color:var(--dim); font-size:12.5px}
+  kbd{background:#21262d;border:1px solid var(--line);border-bottom-width:2px;
+      border-radius:4px;padding:1px 5px;font:11px ui-monospace,monospace}
+  button{background:#21262d;color:var(--ink);border:1px solid var(--line);
+         border-radius:6px;padding:3px 9px;font:600 11px/1.4 inherit;cursor:pointer}
+  button:hover{border-color:#4d5866;background:#2b3440}
+  #dens{color:var(--dim);font:500 11px ui-monospace,Menlo,monospace}
+
+  #grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px;
+    padding:14px 20px 20px; height:calc(100% - 62px);
+  }
+  #grid.solo{grid-template-columns:1fr}
+  #grid.solo .panel:not(.active){display:none}
+
+  .panel{
+    display:flex; flex-direction:column; min-height:0;
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    overflow:hidden; cursor:pointer;
+  }
+  .panel:hover{border-color:#3d4653}
+  .cap{padding:9px 12px; border-bottom:1px solid var(--line); flex:0 0 auto}
+  .cap b{font-size:13px; font-weight:650}
+  .cap .tag{
+    display:inline-block; margin-left:7px; padding:1px 7px; border-radius:99px;
+    font-size:10.5px; font-weight:600; vertical-align:1px;
+  }
+  .tag.new{background:rgba(63,185,80,.15); color:var(--ok)}
+  .tag.old{background:rgba(248,81,73,.15); color:var(--bad)}
+  .tag.alt{background:rgba(210,153,34,.15); color:var(--warn)}
+  .cap p{margin:3px 0 0; color:var(--dim); font-size:11.5px}
+
+  .stage{position:relative; flex:1 1 auto; min-height:0; display:grid; place-items:center; padding:10px}
+  .box{position:relative; aspect-ratio:1/1; height:100%; max-width:100%;
+       border-radius:8px; overflow:hidden; background:#0a2a4d}
+
+  /* A - atlas */
+  #a-img{position:absolute; inset:0; background-image:url(atlas-v6.webp);
+         background-size:800% 800%; background-repeat:no-repeat; will-change:background-position}
+
+  /* B - recorte 3D */
+  #b-wrap{position:absolute; inset:0; perspective:900px; perspective-origin:50% 45%}
+  #b-inner{width:100%; height:100%; transform-style:preserve-3d; will-change:transform}
+  #b-inner img{width:100%; height:100%; object-fit:contain; display:block; user-select:none}
+
+  /* C - control: dos videos fundidos */
+  .vid{position:absolute; top:0; height:100%; width:177.78%; left:-43.33%;
+       object-fit:cover; pointer-events:none; will-change:opacity;
+       transition:opacity 180ms linear}
+
+  .hud{position:absolute; left:8px; top:8px; z-index:5; padding:5px 8px; border-radius:6px;
+       background:rgba(0,0,0,.78); color:#7ee787; pointer-events:none; white-space:pre;
+       font:500 10.5px/1.45 ui-monospace,Menlo,monospace}
+  #global{position:fixed; right:20px; bottom:16px; z-index:20; padding:7px 10px; border-radius:7px;
+          background:rgba(0,0,0,.8); border:1px solid var(--line); color:#7ee787;
+          font:500 11px/1.5 ui-monospace,Menlo,monospace; white-space:pre; pointer-events:none}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Banco de pruebas — ¿cuál sigue de verdad al cursor?</h1>
+  <p>Mueve el cursor por toda la ventana. Los tres reciben la misma posición al mismo tiempo.
+     Haz <kbd>clic</kbd> en un panel para verlo solo; clic otra vez para volver.
+     Prueba sobre todo las <b>diagonales</b> y las <b>esquinas</b>.</p>
+</header>
+
+<div id="grid">
+
+  <section class="panel" data-id="A">
+    <div class="cap">
+      <b>A — Estrella de 7 radios</b><span class="tag new">v6</span>
+      <p><b>Siete clips, uno por dirección, todos desde la misma pose base.</b> El radio se
+         elige por el ángulo del cursor. Falta abajo-derecha: ahí manda el vecino más cercano.</p>
+      <p style="margin-top:6px">
+        <button id="densBtn">v6 / v5 / v3</button>
+        <button id="yBtn" style="margin-left:6px">bandas Y</button>
+        <span id="dens" style="margin-left:8px"></span>
+      </p>
+    </div>
+    <div class="stage"><div class="box">
+      <div id="a-img"></div>
+      <div class="hud" id="a-hud"></div>
+    </div></div>
+  </section>
+
+  <section class="panel" data-id="B">
+    <div class="cap">
+      <b>B — Recorte 3D</b><span class="tag alt">GazeHead</span>
+      <p>Una sola imagen recortada, girada en 3D con CSS. Continuo en los dos ejes, pero es un plano.</p>
+    </div>
+    <div class="stage"><div class="box">
+      <div id="b-wrap"><div id="b-inner"><img src="../puppy_head.webp" alt="" draggable="false"></div></div>
+      <div class="hud" id="b-hud"></div>
+    </div></div>
+  </section>
+
+  <section class="panel" data-id="C">
+    <div class="cap">
+      <b>C — Dos videos fundidos</b><span class="tag old">lo que tienes hoy</span>
+      <p>HORIZONTAL + VERTICAL cruzados por opacidad. Está aquí como control, para ver el fantasma.</p>
+    </div>
+    <div class="stage"><div class="box">
+      <video id="c-h" class="vid" src="../HORIZONTAL.mp4" muted playsinline preload="auto" style="opacity:1"></video>
+      <video id="c-v" class="vid" src="../VERTICAL.mp4"   muted playsinline preload="auto" style="opacity:0"></video>
+      <div class="hud" id="c-hud"></div>
+    </div></div>
+  </section>
+
+</div>
+
+<div id="global"></div>
+
+<script>
+"use strict";
+
+/* ---------- utilidades compartidas (identicas a las del componente) ---------- */
+const clamp = (v,a,b) => v<a?a:v>b?b:v;
+
+/* Mapa cursor -> nx,ny en [-1,1].  ny CRECE HACIA ABAJO en pantalla:
+   quien consuma ny debe invertir el signo para "arriba". */
+const REACH_X = 0.5, REACH_Y = 0.5;
+function pointerToNorm(clientX, clientY, rect){
+  const cx = rect.left + rect.width/2, cy = rect.top + rect.height/2;
+  return {
+    nx: clamp((clientX-cx)/Math.max(1, innerWidth *REACH_X), -1, 1),
+    ny: clamp((clientY-cy)/Math.max(1, innerHeight*REACH_Y), -1, 1),
+  };
+}
+
+/* ---------- A: atlas continuo ---------- */
+/* Dos atlas para comparar el antes y el despues del clip nuevo de izquierda.
+   El interruptor alterna entre ellos con el mismo codigo y la misma imagen. */
+const ATLASES = {
+  /* v6: estrella de RADIOS. Cada radio es un clip propio que arranca en la pose
+     base, y se elige por ANGULO del cursor, no por eje dominante. Con radios a
+     45 grados el error angular maximo baja de 90 a 22.5 grados.
+     Falta el radio SE (abajo-derecha): sin creditos para generarlo. En ese
+     cuadrante gana el vecino mas cercano, S o E. */
+  v6: { tipo:"estrella8", file:"atlas-v6.webp", cols:14, rows:14, center:0,
+        spokes:[{nom:"E",ang:0,band:[1,26]},    {nom:"NE",ang:-45,band:[27,26]},
+                {nom:"N",ang:-90,band:[53,26]}, {nom:"NW",ang:-135,band:[79,26]},
+                {nom:"W",ang:180,band:[105,26]},{nom:"SW",ang:135,band:[131,26]},
+                {nom:"S",ang:90,band:[157,26]}],
+        etiqueta:"v6 · 7 radios · 26 poses/radio · celda 320px · 1.9 MB" },
+  /* v5: cuatro bandas, TODAS ancladas a la misma pose base (celda 0). Es lo que
+     el clip nuevo de izquierda hizo posible: antes la banda horizontal tenia su
+     centro en el frame 161, que no era la base, y de ahi el salto sobre la cara.
+       left  <- Puppy_rotates_head_left  frames 6-112   (anclaje 1.62)
+       right <- HORIZONTAL.mp4           frames 3-101
+       up    <- four_directions          frames 6-34
+       down  <- VERTICAL.mp4             frames 17-70                        */
+  v5: { tipo:"estrella", file:"atlas-v5.webp", cols:10, rows:9, center:0,
+        left:[1,28], right:[29,28], up:[57,16], down:[73,16],
+        etiqueta:"v5 · 4 bandas ancladas a la base · 724 KB" },
+  /* v3: la version anterior, para comparar. Banda X continua cuyo centro NO es
+     la pose base. Sirve para sentir el salto que teniamos. */
+  v3: { tipo:"bandaX", file:"atlas-v3.webp", cols:8, rows:8, x:[0,34], xCenter:11,
+        up:[34,14], down:[48,14],
+        etiqueta:"v3 · centro desalineado (ANTES) · 553 KB" },
+};
+let AT = ATLASES.v6;
+const X_BIAS = 1.25;  // el material de X sigue siendo mejor, pero ya menos
+const DEAD   = 0.04;
+
+const aImg = document.getElementById("a-img");
+
+function aplicarAtlas(){
+  aImg.style.backgroundImage = "url("+AT.file+")";
+  aImg.style.backgroundSize  = (AT.cols*100)+"% "+(AT.rows*100)+"%";
+  document.getElementById("dens").textContent =
+    AT.etiqueta+" · Y "+(USAR_Y ? "con frames reales" : "APAGADO (solo CSS)");
+}
+
+/* Con USAR_Y en false no existe traspaso entre ejes: siempre manda la banda X
+   y el vertical pasa a ser solo inclinacion CSS. Es el experimento que aisla
+   la causa del corte al pasar sobre la cara. */
+let USAR_Y = true;
+
+const GRADOS = 180/Math.PI;
+
+function atlasRender(el, nx, ny){
+  const ax = Math.abs(nx), ay = Math.abs(ny);
+  let k, axis, resX = 0, resY = 0, nombre = "centro";
+
+  const esX = !USAR_Y || ax * X_BIAS >= ay;
+  axis = esX ? "x" : "y";
+
+  if (AT.tipo === "estrella8"){
+    /* Se elige el radio por ANGULO y se avanza por MAGNITUD. El residuo -lo que
+       el radio elegido no cubre respecto a la direccion real del cursor- no se
+       tira: se aplica como un gesto CSS pequeno, de modo que dentro de un mismo
+       radio el perro sigue acompanando al cursor de forma continua. */
+    const m   = Math.min(1, Math.hypot(nx, ny));
+    const ang = Math.atan2(ny, nx) * GRADOS;
+
+    let mejor = AT.spokes[0], mejorD = 1e9;
+    for (const s of AT.spokes){
+      let d = Math.abs(ang - s.ang); if (d > 180) d = 360 - d;
+      if (d < mejorD){ mejorD = d; mejor = s; }
+    }
+    /* Cuando el cursor cae entre dos radios, ninguno de los dos es correcto y al
+       cruzar la bisectriz la pose salta. Se disimula acercando la pose al centro
+       en funcion del error angular: los radios convergen ahi, asi que cuanto mas
+       lejos esta el cursor de un radio, menos se extiende la pose y menor es el
+       salto. Cuesta algo de expresividad justo en las bisectrices. */
+    const errCos = Math.cos(mejorD / GRADOS);
+    const mEf = m * Math.pow(Math.max(errCos, 0), 2.5);
+
+    const band = mejor.band;
+    k = mEf < DEAD ? AT.center
+                   : band[0] + Math.min(band[1]-1, Math.round(mEf * (band[1]-1)));
+    nombre = mEf < DEAD ? "centro" : mejor.nom;
+    axis = "radio";
+
+    const rad = mejor.ang / GRADOS;
+    resX = nx - mEf*Math.cos(rad);
+    resY = ny - mEf*Math.sin(rad);
+  } else if (AT.tipo === "estrella"){
+    // cuatro bandas que salen de la misma celda central: la pose base
+    const band = esX ? (nx < 0 ? AT.left : AT.right)
+                     : (ny < 0 ? AT.up   : AT.down);
+    const amt  = esX ? ax : ay;
+    k = amt < DEAD ? AT.center
+                   : band[0] + Math.min(band[1]-1, Math.round(amt * (band[1]-1)));
+  } else if (esX){
+    // v3: banda X continua, nx = -1 -> primera celda ; 0 -> xCenter ; +1 -> ultima
+    const c = AT.xCenter, last = AT.x[1] - 1;
+    k = AT.x[0] + c + Math.round(nx * (nx >= 0 ? last - c : c));
+  } else {
+    const band = ny < 0 ? AT.up : AT.down;
+    k = band[0] + Math.min(band[1]-1, Math.round(ay * (band[1]-1)));
+  }
+
+  const col = k % AT.cols, row = (k / AT.cols) | 0;
+  el.style.backgroundPosition =
+    (col*100/(AT.cols-1)).toFixed(4)+"% "+(row*100/(AT.rows-1)).toFixed(4)+"%";
+
+  // lo que la pose elegida no cubre se insinua con un gesto pequeno, para que
+  // pasar de un radio al vecino no sea un corte seco
+  const tx = axis === "radio" ? resX*18 : axis === "y" ? nx*12 : 0;
+  const rx = axis === "radio" ? -resY*16 : axis === "x" ? -ny*(USAR_Y ? 7 : 14) : 0;
+  el.style.transform =
+    "translateX("+tx.toFixed(1)+"px) rotateX("+rx.toFixed(2)+"deg)";
+
+  return { k, axis, nombre };
+}
+
+/* ---------- B: recorte 3D ---------- */
+const bInner = document.getElementById("b-inner");
+function headRender(el, nx, ny){
+  el.style.transform =
+    "translate3d("+(nx*16).toFixed(1)+"px,"+(ny*12).toFixed(1)+"px,0)"+
+    " rotateY("+(nx*20).toFixed(2)+"deg)"+
+    " rotateX("+(-ny*13).toFixed(2)+"deg)";
+}
+
+/* ---------- C: control, dos videos fundidos por opacidad ---------- */
+const cH = document.getElementById("c-h"), cV = document.getElementById("c-v");
+const T = { hCenter:0.0, hEnd:4.2, vCenter:0.0, vEnd:4.5 };  // s
+let cReady = 0, cAxis = "h", cBusy = false;
+[cH,cV].forEach(v => {
+  v.addEventListener("loadeddata", () => { v.pause(); v.currentTime = 0; cReady++; }, {once:true});
+  v.addEventListener("play", () => v.pause());   // el video NUNCA se reproduce
+});
+function crossfadeRender(nx, ny){
+  if (cReady < 2 || cBusy) return cAxis;
+  const axis = Math.abs(nx) >= Math.abs(ny) ? "h" : "v";
+  const v = axis === "h" ? cH : cV;
+  const amt = axis === "h" ? Math.abs(nx) : Math.abs(ny);
+  const t = axis === "h" ? T.hCenter + amt*(T.hEnd-T.hCenter)
+                         : T.vCenter + amt*(T.vEnd-T.vCenter);
+  cBusy = true;
+  // red de seguridad: si un seek no termina, no se puede quedar bloqueado para
+  // siempre. Aun asi, mientras dura el seek se descartan movimientos del
+  // cursor: eso es exactamente el "se entrecorta" que esta tecnica no evita.
+  const free = () => { clearTimeout(guard); cBusy = false; };
+  const guard = setTimeout(free, 300);
+  v.addEventListener("seeked", free, {once:true});
+  try { v.currentTime = t; } catch(e){ free(); }
+  if (axis !== cAxis){
+    cAxis = axis;
+    cH.style.opacity = axis==="h" ? "1" : "0";
+    cV.style.opacity = axis==="v" ? "1" : "0";
+  }
+  cH.style.transform = "scaleX("+(nx<0?-1:1)+")";
+  return axis;
+}
+
+/* ---------- bucle unico ---------- */
+/* Se suaviza la POSICION DEL CURSOR, no un nx/ny ya normalizado. Asi cada
+   panel deriva su propio nx/ny contra su propia caja — que es como se comporta
+   el componente real, y hace que los tres miren al mismo punto de la pantalla
+   aunque esten en sitios distintos. */
+const boxA = aImg.parentElement,
+      boxB = document.getElementById("b-wrap").parentElement,
+      boxC = cH.parentElement;
+
+const target = {x:innerWidth/2, y:innerHeight/2};
+const now    = {x:innerWidth/2, y:innerHeight/2};
+const SMOOTH = 0.16;
+let raf = null;
+
+const hudA=document.getElementById("a-hud"), hudB=document.getElementById("b-hud"),
+      hudC=document.getElementById("c-hud"), hudG=document.getElementById("global");
+
+function frame(){
+  raf = null;
+  now.x += (target.x-now.x)*SMOOTH;
+  now.y += (target.y-now.y)*SMOOTH;
+
+  const nA = pointerToNorm(now.x, now.y, boxA.getBoundingClientRect());
+  const nB = pointerToNorm(now.x, now.y, boxB.getBoundingClientRect());
+  const nC = pointerToNorm(now.x, now.y, boxC.getBoundingClientRect());
+
+  const a    = atlasRender(aImg,   nA.nx, nA.ny);
+  headRender(bInner, nB.nx, nB.ny);
+  const axis = crossfadeRender(nC.nx, nC.ny);
+
+  const q = (nA.ny<-0.15?"arriba":nA.ny>0.15?"abajo":"centro") + "-" +
+            (nA.nx<-0.15?"izq":nA.nx>0.15?"der":"centro");
+  const banda = a.axis === "radio" ? a.nombre
+              : (AT.tipo === "estrella" && a.k === AT.center) ? "centro"
+              : a.axis === "x" ? (nA.nx < 0 ? "izquierda" : "derecha")
+              : (nA.ny < 0 ? "arriba" : "abajo");
+  hudA.textContent = "celda "+a.k+"\nbanda "+banda+"  (sin espejo)";
+  hudB.textContent = "rotY "+(nB.nx*20).toFixed(0)+"°\nrotX "+(-nB.ny*13).toFixed(0)+"°";
+  hudC.textContent = "eje "+axis.toUpperCase()+"\n"+(axis==="h"?"ignora ny":"ignora nx");
+  hudG.textContent = "A: nx "+nA.nx.toFixed(2)+"   ny "+nA.ny.toFixed(2)+"\ncursor: "+q;
+
+  if (Math.abs(target.x-now.x)>0.4 || Math.abs(target.y-now.y)>0.4) schedule();
+}
+function schedule(){ if (raf===null) raf = requestAnimationFrame(frame); }
+
+addEventListener("pointermove", e => {
+  target.x = e.clientX; target.y = e.clientY; schedule();
+}, {passive:true});
+document.addEventListener("pointerleave", () => {
+  const r = boxA.getBoundingClientRect();
+  target.x = r.left + r.width/2; target.y = r.top + r.height/2; schedule();
+});
+addEventListener("resize", schedule);
+
+/* interruptor de densidad: no debe disparar el modo solo del panel */
+const densBtn = document.getElementById("densBtn");
+densBtn.addEventListener("click", e => {
+  e.stopPropagation();
+  AT = AT === ATLASES.v6 ? ATLASES.v5 : AT === ATLASES.v5 ? ATLASES.v3 : ATLASES.v6;
+  aplicarAtlas();
+  schedule();
+});
+document.getElementById("yBtn").addEventListener("click", e => {
+  e.stopPropagation();
+  USAR_Y = !USAR_Y;
+  aplicarAtlas();
+  schedule();
+});
+aplicarAtlas();
+
+/* clic = ver un panel solo */
+const grid = document.getElementById("grid");
+grid.addEventListener("click", e => {
+  const p = e.target.closest(".panel"); if (!p) return;
+  const solo = grid.classList.contains("solo") && p.classList.contains("active");
+  grid.querySelectorAll(".panel").forEach(x => x.classList.remove("active"));
+  if (solo) grid.classList.remove("solo");
+  else { grid.classList.add("solo"); p.classList.add("active"); }
+});
+
+schedule();
+</script>
+</body>
+</html>

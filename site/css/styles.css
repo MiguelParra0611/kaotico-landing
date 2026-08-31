@@ -1,0 +1,596 @@
+/* =========================================================================
+   Kaótico · Pelos y Trufas
+   Fondo blanco, textos en azul oscuro, detalles en amarillo.
+   El azul del hero no es decoración: es el fondo propio del asset del perro.
+   ========================================================================= */
+
+:root {
+  --azul-900: #0a2a47;   /* titulares y texto */
+  --azul-700: #12456f;
+  --azul-500: #1e88e5;
+  --azul-100: #e4f0fb;
+
+  --amarillo-500: #ffc93c;
+  --amarillo-600: #e8ac16;
+
+  --blanco: #ffffff;
+  --gris-100: #f4f7fa;
+  --tinta-suave: #5a7186;
+
+  --sombra-flota: 0 4px 14px rgba(10, 42, 71, .10), 0 16px 44px rgba(10, 42, 71, .14);
+  --ancho: 1240px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+body {
+  margin: 0;
+  background: var(--blanco);
+  color: var(--azul-900);
+  font: 400 17px/1.65 "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .marca { font-family: "Outfit", ui-sans-serif, system-ui, sans-serif; margin: 0; }
+h1, h2, h3 { font-weight: 650; line-height: 1.1; letter-spacing: -0.02em; }
+p { margin: 0; }
+a { color: inherit; }
+
+.contenedor {
+  width: 100%;
+  max-width: var(--ancho);
+  margin-inline: auto;
+  padding-inline: 32px;
+}
+
+.saltar {
+  position: absolute; left: -9999px; top: 0; z-index: 300;
+  background: var(--azul-900); color: #fff; padding: 12px 18px;
+}
+.saltar:focus { left: 0; }
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 3px solid var(--amarillo-500);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* =========================================================================
+   Navegación — vive ENCIMA del hero, sin barra propia.
+   Al salir del hero se vuelve una barra blanca para seguir siendo utilizable.
+   ========================================================================= */
+
+.nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  padding: 22px 0;
+  transition: background .3s ease, padding .3s ease, box-shadow .3s ease;
+}
+.nav .contenedor {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  width: 100%;
+}
+
+.marca {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1;
+  text-decoration: none;
+  color: #fff;
+  margin-right: auto;
+}
+.marca b {
+  font-size: 25px;
+  font-weight: 700;
+  letter-spacing: .01em;
+}
+.marca small {
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  opacity: .82;
+  margin-top: 5px;
+}
+
+.enlaces { display: flex; align-items: center; gap: 6px; }
+.enlaces a {
+  position: relative;
+  padding: 8px 4px;
+  margin-inline: 10px;
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, .88);
+  transition: color .18s ease;
+}
+.enlaces a::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--amarillo-500);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .22s ease;
+}
+.enlaces a:hover { color: #fff; }
+.enlaces a:hover::after { transform: scaleX(1); }
+
+/* fuera del hero */
+.nav[data-fuera="si"] {
+  background: rgba(255, 255, 255, .93);
+  backdrop-filter: saturate(150%) blur(14px);
+  box-shadow: 0 1px 0 rgba(10, 42, 71, .09);
+  padding: 12px 0;
+}
+.nav[data-fuera="si"] .marca { color: var(--azul-900); }
+.nav[data-fuera="si"] .marca small { color: var(--tinta-suave); opacity: 1; }
+.nav[data-fuera="si"] .enlaces a { color: var(--tinta-suave); }
+.nav[data-fuera="si"] .enlaces a:hover { color: var(--azul-900); }
+
+.menu-btn {
+  display: none;
+  width: 44px; height: 44px;
+  border: 0; border-radius: 12px;
+  background: rgba(255, 255, 255, .18);
+  color: #fff;
+  cursor: pointer;
+  place-items: center;
+}
+.nav[data-fuera="si"] .menu-btn {
+  background: var(--gris-100);
+  color: var(--azul-900);
+}
+.menu-btn svg { width: 21px; height: 21px; }
+
+/* =========================================================================
+   Hero — pantalla completa
+   ========================================================================= */
+
+.hero {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--azul-500);
+}
+
+.hero-lienzo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  container-type: size;
+}
+.hero-fondo {
+  position: absolute;
+  inset: 0;
+  background-image: url("../assets/fondo.webp");
+  background-size: cover;
+  background-position: center;
+}
+
+/* El sprite se escala EXACTAMENTE como el fondo. Con cover sobre una imagen
+   de 1280x720 centrada: ancho renderizado = max(100cqw, 177.78cqh); el perro
+   ocupa un cuadrado del 56.25% de ese ancho y su centro cae en el 52.5%. */
+.hero-sprite {
+  --img-ancho: max(100cqw, 177.7778cqh);
+  position: absolute;
+  width: max(56.25cqw, 100cqh);
+  aspect-ratio: 1 / 1;
+  left: calc(50% + 0.025 * var(--img-ancho));
+  top: 50%;
+  transform: translate(calc(-50% + var(--gesto-x, 0px)), -50%)
+             rotateX(var(--gesto-y, 0deg));
+  background-repeat: no-repeat;
+  will-change: background-position, transform;
+  /* La celda del atlas y el fondo son codificaciones distintas de los mismos
+     pixeles, asi que su union deja una costura vertical visible (medida: 5/255
+     frente a 0.79 de variacion natural del degradado). Difuminando los bordes
+     laterales el salto se reparte en 27px y desaparece. Solo a los lados: el
+     perro deja 40px de margen a la izquierda y 60px a la derecha, y arriba y
+     abajo el sprite coincide con el borde del hero, donde no hay costura. */
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 3%, #000 97%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 3%, #000 97%, transparent 100%);
+}
+
+/* Oscurecidos suaves: arriba para que la navegación se lea, abajo izquierda
+   para el titular. Ninguno toca la cara del perro. */
+.hero-velo {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgba(4, 30, 56, .46) 0%, rgba(4, 30, 56, 0) 22%),
+    linear-gradient(22deg, rgba(4, 30, 56, .80) 0%, rgba(4, 30, 56, .38) 32%, rgba(4, 30, 56, 0) 56%);
+}
+
+.hero-capa {
+  position: relative;
+  z-index: 2;
+  min-height: 100svh;
+  display: flex;
+  align-items: flex-end;
+  padding-block: 132px 42px;
+  pointer-events: none;
+}
+.hero-capa .contenedor { width: 100%; }
+
+/* ---------- abajo a la izquierda: el gancho ----------
+   Tres líneas con jerarquía descendente, pegadas abajo y a la izquierda para
+   caer en el sector donde el cachorro mira hacia abajo-izquierda. */
+.hero-gancho {
+  max-width: 32rem;
+  color: #fff;
+  pointer-events: auto;
+}
+.hero-gancho h1 { display: grid; gap: 2px; }
+.linea-1 {
+  display: block;
+  font-size: clamp(2rem, 3.9vw, 3.15rem);
+  line-height: 1.06;
+  text-wrap: balance;
+}
+.linea-1 em { font-style: normal; color: var(--amarillo-500); }
+.linea-2 {
+  display: block;
+  font-size: clamp(1.3rem, 2.3vw, 1.95rem);
+  line-height: 1.1;
+  font-weight: 500;
+  color: rgba(255, 255, 255, .90);
+}
+.linea-3 {
+  margin-top: 16px;
+  font-size: clamp(.88rem, 1.05vw, .98rem);
+  letter-spacing: .02em;
+  color: rgba(255, 255, 255, .72);
+}
+
+/* ---------- a la derecha, a media altura: el hueso ---------- */
+/* El hueso se coloca a partir de DONDE TERMINA EL PERRO, no de la derecha de
+   la pantalla. El fondo se pinta con `cover`, así que su escala se deduce del
+   viewport: ancho renderizado = max(100vw, 177.78svh) y el perro ocupa un
+   cuadrado de max(56.25vw, 100svh) centrado en el 52.5% de la imagen. El borde
+   derecho del perro cae en su 93.33%. Si no cabe, se pega al margen. */
+.hueso-sitio {
+  --img: max(100vw, 177.7778svh);
+  --sw: max(56.25vw, 100svh);
+  --ancho-hueso: clamp(166px, 17vw, 236px);
+  position: absolute;
+  z-index: 3;
+  top: 44%;
+  left: min(
+    calc(50% + 0.025 * var(--img) + 0.4333 * var(--sw) + 10px),
+    calc(100% - var(--ancho-hueso) - 12px)
+  );
+  transform: translateY(-50%);
+}
+
+.hueso {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--ancho-hueso, clamp(166px, 17vw, 236px));
+  color: var(--amarillo-500);
+  text-decoration: none;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: rotate(-7deg);
+  filter: drop-shadow(0 6px 18px rgba(4, 30, 56, .40));
+  transition: transform .28s cubic-bezier(.34, 1.56, .64, 1);
+}
+.hueso-svg {
+  grid-area: 1 / 1;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.hueso span {
+  grid-area: 1 / 1;
+  font: 650 clamp(.85rem, 1.15vw, 1.08rem)/1 "Outfit", sans-serif;
+  letter-spacing: -.01em;
+  color: var(--amarillo-500);
+  white-space: nowrap;
+}
+
+.hueso:hover, .hueso:focus-visible { animation: menear .55s ease both; }
+@keyframes menear {
+  0%   { transform: rotate(-7deg)  scale(1); }
+  22%  { transform: rotate(-1deg)  scale(1.05); }
+  46%  { transform: rotate(-12deg) scale(1.05); }
+  70%  { transform: rotate(-4deg)  scale(1.03); }
+  100% { transform: rotate(-7deg)  scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hueso:hover, .hueso:focus-visible { animation: none; transform: rotate(-7deg) scale(1.04); }
+}
+
+/* =========================================================================
+   Burbuja de WhatsApp — blanca, porque el fondo del sitio es blanco
+   ========================================================================= */
+
+.wpp {
+  position: fixed;
+  z-index: 250;
+  right: max(3vw, 20px);
+  bottom: max(3vw, 20px);
+  width: 60px; height: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--blanco);
+  color: var(--azul-900);
+  box-shadow: var(--sombra-flota);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.wpp svg { width: 29px; height: 29px; }
+.wpp::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2.5px solid var(--amarillo-500);
+  opacity: 0;
+  transition: opacity .2s ease;
+}
+.wpp:hover { transform: translateY(-3px) scale(1.05); }
+.wpp:hover::after { opacity: 1; }
+
+/* =========================================================================
+   Secciones del cuerpo (pendientes de contenido real)
+   ========================================================================= */
+
+.seccion { padding-block: clamp(72px, 10vw, 128px); }
+.seccion-gris { background: var(--gris-100); }
+
+.rotulo {
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--amarillo-600);
+  margin-bottom: 14px;
+}
+.seccion h2 { font-size: clamp(2rem, 3.4vw, 2.9rem); text-wrap: balance; }
+.seccion p.intro {
+  margin-top: 18px;
+  max-width: 40rem;
+  font-size: 1.06rem;
+  color: var(--tinta-suave);
+  text-wrap: pretty;
+}
+
+.quien {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: clamp(34px, 5vw, 76px);
+  align-items: center;
+}
+
+.lista-marcas {
+  list-style: none;
+  margin: 26px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.lista-marcas li {
+  position: relative;
+  padding-left: 30px;
+  font-size: 1rem;
+  color: var(--azul-900);
+}
+.lista-marcas li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: .52em;
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  background: var(--amarillo-500);
+  transform: rotate(45deg);
+}
+
+.quien-foto { margin: 0; }
+.hueco-foto {
+  aspect-ratio: 4 / 5;
+  border-radius: 22px;
+  background: var(--azul-100);
+  border: 2px dashed rgba(18, 69, 111, .30);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  color: var(--azul-700);
+}
+.hueco-foto svg { width: 40px; height: 40px; opacity: .7; }
+.hueco-foto span { font-size: 14px; font-weight: 500; }
+
+/* ---------- tarjetas de servicio ---------- */
+.tarjetas {
+  margin-top: 46px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+.tarjeta {
+  background: var(--blanco);
+  border: 1px solid rgba(10, 42, 71, .10);
+  border-radius: 20px;
+  padding: 30px 28px;
+  box-shadow: 0 1px 2px rgba(10, 42, 71, .04);
+}
+.tarjeta h3 { font-size: 1.35rem; }
+.tarjeta p {
+  margin-top: 12px;
+  color: var(--tinta-suave);
+  font-size: .99rem;
+  text-wrap: pretty;
+}
+.tarjeta-destacada {
+  border-color: rgba(232, 172, 22, .45);
+  box-shadow: 0 2px 4px rgba(10, 42, 71, .05), 0 18px 40px rgba(10, 42, 71, .07);
+}
+
+.precio {
+  margin-top: 22px !important;
+  padding-top: 20px;
+  border-top: 1px solid rgba(10, 42, 71, .10);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.precio-desde {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--tinta-suave);
+}
+.precio b {
+  font: 700 2.1rem/1.05 "Outfit", sans-serif;
+  color: var(--azul-900);
+}
+.precio-nota {
+  margin-top: 10px !important;
+  font-size: .88rem !important;
+  line-height: 1.5;
+  color: var(--tinta-suave);
+}
+
+/* ---------- por qué no hay tarifa cerrada ---------- */
+.porque {
+  margin-top: 34px;
+  display: flex;
+  gap: 22px;
+  align-items: flex-start;
+  background: var(--blanco);
+  border: 1px solid rgba(10, 42, 71, .10);
+  border-left: 5px solid var(--amarillo-500);
+  border-radius: 18px;
+  padding: 30px 32px;
+}
+.porque-icono {
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 201, 60, .22);
+  color: var(--amarillo-600);
+}
+.porque-icono svg { width: 23px; height: 23px; }
+.porque h3 { font-size: 1.22rem; }
+.porque p {
+  margin-top: 12px;
+  color: var(--tinta-suave);
+  max-width: 58ch;
+  text-wrap: pretty;
+}
+.porque-accion { color: var(--azul-900) !important; }
+
+.pendiente {
+  margin-top: 26px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--blanco);
+  border: 1px solid rgba(10, 42, 71, .12);
+  border-left: 4px solid var(--amarillo-500);
+  font-size: 14.5px;
+  color: var(--tinta-suave);
+}
+
+/* =========================================================================
+   Adaptación
+   ========================================================================= */
+
+@media (max-width: 900px) {
+  .contenedor { padding-inline: 22px; }
+  .enlaces { display: none; }
+  .menu-btn { display: grid; }
+
+  /* En vertical, `cover` sobre una imagen 16:9 amplía tanto que solo se ve un
+     primer plano deformado. Aquí el perro ocupa su propia banda 16:9 arriba y
+     el texto vive debajo, sobre blanco. El conjunto sigue llenando la pantalla. */
+  .hero {
+    display: flex;
+    flex-direction: column;
+    background: var(--blanco);
+  }
+  .hero-lienzo {
+    position: relative;
+    inset: auto;
+    flex: 0 0 auto;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+  }
+  .hero-velo {
+    inset: 0 0 auto 0;
+    height: 110px;
+    background: linear-gradient(to bottom, rgba(4, 30, 56, .55) 0%, rgba(4, 30, 56, 0) 100%);
+  }
+
+  .hero-capa {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    align-items: center;
+    /* deja sitio abajo para el hueso, que va posicionado */
+    padding-block: 28px 150px;
+  }
+  .hero-gancho { max-width: none; color: var(--azul-900); }
+  /* Sobre blanco hay que reasignar TODOS los colores del gancho: los del
+     escritorio son blancos sobre el azul del hero y aquí desaparecerían. */
+  .linea-1 { font-size: clamp(1.9rem, 7.6vw, 2.6rem); }
+  .linea-1 em { color: var(--amarillo-600); }
+  .linea-2 { color: var(--azul-700); font-size: clamp(1.15rem, 4.6vw, 1.6rem); }
+  .linea-3 { color: var(--tinta-suave); margin-top: 14px; }
+
+  /* El hueso baja abajo a la izquierda: a media altura taparía al perro.
+     El desplazamiento incluye el saliente del bulto (0.30 de la altura), para
+     que el borde real del hueso quede alineado con el texto y no se salga. */
+  .hueso-sitio {
+    top: auto;
+    bottom: 7vh;
+    right: auto;
+    left: calc(22px + 68px * .30);
+    transform: none;
+    pointer-events: auto;
+  }
+  /* el amarillo claro sobre blanco no llega al contraste mínimo: se oscurece
+     el trazo y el texto pasa a azul */
+  .hueso { color: var(--amarillo-600); }
+  .hueso span { color: var(--azul-900); }
+
+  .quien { grid-template-columns: 1fr; }
+  .quien-foto { max-width: 330px; }
+  .tarjetas { grid-template-columns: 1fr; gap: 16px; margin-top: 34px; }
+  .porque { flex-direction: column; gap: 16px; padding: 26px 24px; }
+}
+
+@media (max-width: 560px) {
+  body { font-size: 16px; }
+  .marca b { font-size: 21px; }
+  .wpp { width: 54px; height: 54px; }
+  .wpp svg { width: 26px; height: 26px; }
+}
