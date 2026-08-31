@@ -48,6 +48,14 @@ a { color: inherit; }
   padding-inline: 32px;
 }
 
+/* La navegacion y el hero se pegan mas a las esquinas que el cuerpo del sitio:
+   ahi el aire lateral es del fondo, no del texto, y centrarlos como una
+   seccion mas los dejaba flotando en medio de la pantalla. */
+.contenedor-ancho {
+  max-width: 1600px;
+  padding-inline: clamp(28px, 3.4vw, 60px);
+}
+
 .saltar {
   position: absolute; left: -9999px; top: 0; z-index: 300;
   background: var(--azul-900); color: #fff; padding: 12px 18px;
@@ -84,28 +92,21 @@ a { color: inherit; }
 
 .marca {
   display: inline-flex;
-  flex-direction: column;
-  line-height: 1;
-  text-decoration: none;
-  color: #fff;
+  align-items: center;
   margin-right: auto;
+  /* el logo trae aire propio arriba y abajo; se compensa para que su masa
+     quede alineada con los enlaces */
+  margin-block: -4px;
 }
-.marca b {
-  font-size: 25px;
-  font-weight: 700;
-  letter-spacing: .01em;
-}
-.marca small {
-  font-family: "Inter", sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  opacity: .82;
-  margin-top: 5px;
+.marca img {
+  display: block;
+  width: auto;
+  height: clamp(42px, 4.4vw, 56px);
 }
 
-.enlaces { display: flex; align-items: center; gap: 6px; }
+/* el ultimo enlace arrastra su margen lateral y dejaba los enlaces 15px mas
+   adentro que el logo; se compensa para que ambos alineen con el borde */
+.enlaces { display: flex; align-items: center; gap: 6px; margin-right: -14px; }
 .enlaces a {
   position: relative;
   padding: 8px 4px;

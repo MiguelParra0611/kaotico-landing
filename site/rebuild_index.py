@@ -50,10 +50,9 @@ HTML = '''<!doctype html>
 <!-- La navegación no tiene barra propia: flota sobre el hero y solo se
      convierte en barra blanca cuando el hero deja de estar en pantalla. -->
 <nav class="nav" id="nav" data-fuera="no" aria-label="Principal">
-  <div class="contenedor">
-    <a class="marca" href="#">
-      <b>KAÓTICO</b>
-      <small>Pelos y Trufas</small>
+  <div class="contenedor contenedor-ancho">
+    <a class="marca" href="#" aria-label="Kaótico · Pelos y Trufas">
+      <img src="assets/logo.png" alt="Kaótico · Pelos y Trufas" width="1702" height="565">
     </a>
 
     <div class="enlaces">
@@ -79,7 +78,7 @@ HTML = '''<!doctype html>
   <div class="hero-velo"></div>
 
   <div class="hero-capa">
-    <div class="contenedor">
+    <div class="contenedor contenedor-ancho">
       <div class="hero-gancho">
         <h1>
           <span class="linea-1">Tu perro sale de aquí <em>irreconocible</em></span>
