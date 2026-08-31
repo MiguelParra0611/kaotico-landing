@@ -39,11 +39,11 @@ milisegundos, que es lo que se percibe como entrecortado.
 - [x] Productos en carrusel, con reflejo al pasar por encima
 - [x] Agenda con calendario y giro de hoja al cambiar de mes
 - [x] Contacto con ubicación y horarios
+- [x] Asesorías en la navegación
 
 ### En curso
 - [ ] **Seguir puliendo los textos con la voz del dueño**, sección por sección
 - [ ] Fotos reales del dueño y de antes/después
-- [ ] Decidir si "Asesorías" entra en la navegación superior
 
 ### Pendiente de decisión
 - [ ] Enlace de WhatsApp al número real (hoy apunta a `wa.me/` sin destinatario)

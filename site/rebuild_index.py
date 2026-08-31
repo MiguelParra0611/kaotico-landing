@@ -56,8 +56,9 @@ HTML = '''<!doctype html>
     </a>
 
     <div class="enlaces">
-      <a href="#productos">Productos</a>
       <a href="#servicios">Servicios</a>
+      <a href="#asesorias">Asesorías</a>
+      <a href="#productos">Productos</a>
       <a href="#agenda">Agenda</a>
       <a href="#contacto">Contacto</a>
     </div>
