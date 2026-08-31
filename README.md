@@ -47,6 +47,7 @@ milisegundos, que es lo que se percibe como entrecortado.
 - [x] Publicado en Vercel, con despliegue automático en cada push
 - [x] **Seguimiento por giroscopio en móvil**: sin cursor, el perro sigue la
       inclinación del teléfono
+- [x] Favicon con la cara del cachorro
 
 ### En curso
 - [ ] **Seguir puliendo los textos con la voz del dueño**, sección por sección
@@ -116,6 +117,12 @@ así que la pista arrancaba desplazada exactamente los 132 px del padding.
 Entrando un día 31, el mes en curso no tiene ni un hueco libre y parecía roto.
 **Resuelto** abriendo en el mes siguiente cuando el actual ya no tiene disponibilidad.
 Los días pasados tampoco se pintan como "ocupados", que no lo están.
+
+### No había favicon
+`/favicon.ico` daba 404 y la pestaña salía en blanco. El logo es un wordmark
+apaisado y a 32 px sería ilegible, así que el icono es **la cara del cachorro**,
+recortada del propio fondo. A 16 px queda pastoso —inevitable con una foto— pero
+se reconoce; a 32 y 48 se lee bien.
 
 ### Roturas del propio proceso
 `index.html` se partió dos veces al editarlo buscando índices de cadenas: en ambos casos

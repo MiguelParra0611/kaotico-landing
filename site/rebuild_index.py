@@ -40,6 +40,9 @@ HTML = '''<!doctype html>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;650;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+
 <link rel="preload" as="image" href="assets/fondo.webp">
 <link rel="preload" as="image" href="assets/atlas-lo.webp">
 </head>
