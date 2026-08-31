@@ -239,7 +239,9 @@ a { color: inherit; }
   color: #fff;
   pointer-events: auto;
 }
+/* 'Para bien' respira: es una frase aparte, no la segunda mitad de la anterior */
 .hero-gancho h1 { display: grid; gap: 2px; }
+.linea-2 { margin-top: 14px; }
 .linea-1 {
   display: block;
   font-size: clamp(2rem, 3.9vw, 3.15rem);
@@ -410,8 +412,8 @@ a { color: inherit; }
 
 .quien-foto { margin: 0; }
 .hueco-foto {
-  aspect-ratio: 4 / 5;
-  border-radius: 22px;
+  aspect-ratio: 1 / 1;
+  border-radius: 24px;
   background: var(--azul-100);
   border: 2px dashed rgba(18, 69, 111, .30);
   display: grid;
@@ -521,6 +523,284 @@ a { color: inherit; }
   color: var(--tinta-suave);
 }
 
+
+/* =========================================================================
+   Asesorías
+   ========================================================================= */
+
+.rejilla-asesoria {
+  list-style: none;
+  margin: 42px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.rejilla-asesoria li {
+  padding: 26px 24px;
+  border-radius: 18px;
+  background: var(--gris-100);
+  border: 1px solid rgba(10, 42, 71, .07);
+}
+.rejilla-asesoria h3 { font-size: 1.12rem; }
+.rejilla-asesoria p {
+  margin-top: 10px;
+  font-size: .95rem;
+  color: var(--tinta-suave);
+  text-wrap: pretty;
+}
+.nota-suave {
+  margin-top: 26px;
+  font-size: .92rem;
+  color: var(--tinta-suave);
+  font-style: italic;
+}
+
+/* =========================================================================
+   Productos — carrusel de una fila
+   ========================================================================= */
+
+.carrusel { margin-top: 34px; }
+.carr-cab {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.carr-btn {
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border: 1px solid rgba(10, 42, 71, .14);
+  border-radius: 50%;
+  background: var(--blanco);
+  color: var(--azul-900);
+  cursor: pointer;
+  transition: background .18s ease, border-color .18s ease, transform .18s ease;
+}
+.carr-btn svg { width: 19px; height: 19px; }
+.carr-btn:hover { background: var(--azul-100); border-color: rgba(10, 42, 71, .22); }
+.carr-btn:active { transform: scale(.94); }
+.carr-btn[disabled] { opacity: .35; cursor: default; }
+.carr-btn[disabled]:hover { background: var(--blanco); }
+
+/* La pista se desborda a proposito hasta el borde de la pantalla: cortar las
+   tarjetas en el margen del contenedor insinua que hay mas a los lados. */
+.carr-pista {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  --inset-pista: max(24px, calc((100vw - var(--ancho)) / 2 + 32px));
+  padding: 6px var(--inset-pista) 26px;
+  /* sin esto el scroll-snap alinea la primera tarjeta con el borde del
+     contenedor y se come el relleno: arrancaba pegada al canto de la pantalla */
+  scroll-padding-inline: var(--inset-pista);
+}
+.carr-pista::-webkit-scrollbar { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .carr-pista { scroll-behavior: auto; }
+}
+
+.prod {
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 258px;
+  scroll-snap-align: start;
+  padding: 20px 20px 24px;
+  border-radius: 20px;
+  background: var(--blanco);
+  border: 1px solid rgba(10, 42, 71, .10);
+  transition: transform .32s cubic-bezier(.2, .7, .3, 1),
+              box-shadow .32s ease, border-color .32s ease;
+}
+/* El reflejo: una banda clara que cruza la tarjeta al pasar por encima. */
+.prod::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  pointer-events: none;
+  background: linear-gradient(115deg,
+    transparent 34%,
+    rgba(255, 255, 255, .85) 46%,
+    rgba(255, 255, 255, .30) 54%,
+    transparent 66%);
+  transform: translateX(-130%);
+  transition: transform .75s cubic-bezier(.3, .6, .3, 1);
+}
+.prod:hover, .prod:focus-within {
+  transform: translateY(-5px) scale(1.02);
+  border-color: rgba(232, 172, 22, .45);
+  box-shadow: 0 6px 18px rgba(10, 42, 71, .10), 0 22px 48px rgba(10, 42, 71, .12);
+}
+.prod:hover::after, .prod:focus-within::after { transform: translateX(130%); }
+@media (prefers-reduced-motion: reduce) {
+  .prod, .prod::after { transition: none; }
+  .prod:hover { transform: none; }
+}
+
+.prod-img {
+  aspect-ratio: 4 / 3;
+  border-radius: 14px;
+  background: var(--azul-100);
+  border: 1px dashed rgba(18, 69, 111, .28);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 7px;
+  color: var(--azul-700);
+  margin-bottom: 18px;
+}
+.prod-img svg { width: 30px; height: 30px; opacity: .65; }
+.prod-img span { font-size: 12px; font-weight: 500; letter-spacing: .04em; }
+.prod h3 { font-size: 1.06rem; }
+.prod p {
+  margin-top: 8px;
+  font-size: .92rem;
+  line-height: 1.55;
+  color: var(--tinta-suave);
+  text-wrap: pretty;
+}
+
+/* =========================================================================
+   Agenda — calendario
+   ========================================================================= */
+
+.cal {
+  margin-top: 40px;
+  max-width: 560px;
+}
+.cal-cab {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.cal-cab h3 {
+  flex: 1;
+  text-align: center;
+  font-size: 1.22rem;
+  text-transform: capitalize;
+}
+.cal-nav {
+  width: 40px; height: 40px;
+  display: grid; place-items: center;
+  border: 1px solid rgba(10, 42, 71, .14);
+  border-radius: 50%;
+  background: var(--blanco);
+  color: var(--azul-900);
+  cursor: pointer;
+  transition: background .18s ease, transform .18s ease;
+}
+.cal-nav svg { width: 18px; height: 18px; }
+.cal-nav:hover { background: var(--azul-100); }
+.cal-nav:active { transform: scale(.94); }
+
+/* La hoja gira sobre su canto, como cuando pasas una pagina y la dejas
+   detras de la siguiente. La perspectiva vive en el marco. */
+.cal-marco { perspective: 1500px; }
+.cal-hoja {
+  transform-origin: left center;
+  transition: transform .26s cubic-bezier(.4, 0, .6, 1), opacity .26s ease;
+}
+.cal-hoja[data-vuelta="sale-adelante"] {
+  transform-origin: left center;
+  transform: rotateY(-34deg) translateZ(-60px);
+  opacity: 0;
+}
+.cal-hoja[data-vuelta="entra-adelante"] {
+  transform-origin: right center;
+  transform: rotateY(26deg) translateZ(-40px);
+  opacity: 0;
+  transition: none;
+}
+.cal-hoja[data-vuelta="sale-atras"] {
+  transform-origin: right center;
+  transform: rotateY(34deg) translateZ(-60px);
+  opacity: 0;
+}
+.cal-hoja[data-vuelta="entra-atras"] {
+  transform-origin: left center;
+  transform: rotateY(-26deg) translateZ(-40px);
+  opacity: 0;
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cal-hoja, .cal-hoja[data-vuelta] { transition: opacity .18s ease; transform: none; }
+}
+
+.cal-semana, .cal-rejilla {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.cal-semana {
+  margin-bottom: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  color: var(--tinta-suave);
+  text-align: center;
+}
+.cal-dia {
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  font-size: .95rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+.cal-dia.vacio { border: 0; }
+.cal-dia.libre {
+  background: rgba(255, 201, 60, .16);
+  border-color: rgba(232, 172, 22, .40);
+  color: var(--azul-900);
+  cursor: pointer;
+  transition: background .16s ease, transform .16s ease;
+}
+.cal-dia.libre:hover { background: rgba(255, 201, 60, .34); transform: translateY(-2px); }
+.cal-dia.ocupado {
+  background: var(--gris-100);
+  color: #a9b6c2;
+  text-decoration: line-through;
+}
+.cal-dia.cerrado { color: #c4cdd6; }
+/* pasado: ni tachado ni gris de 'ocupado', solo apagado */
+.cal-dia.pasado { color: #cfd7de; }
+
+.cal-leyenda {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: .86rem;
+  color: var(--tinta-suave);
+}
+.cal-leyenda span { display: inline-flex; align-items: center; gap: 7px; }
+.pt { width: 11px; height: 11px; border-radius: 4px; display: inline-block; }
+.pt.libre { background: rgba(255, 201, 60, .55); border: 1px solid rgba(232, 172, 22, .6); }
+.pt.ocupado { background: var(--gris-100); border: 1px solid rgba(10, 42, 71, .18); }
+.pt.cerrado { background: transparent; border: 1px dashed rgba(10, 42, 71, .28); }
+
+/* =========================================================================
+   Contacto
+   ========================================================================= */
+
+.rejilla-contacto {
+  margin-top: 42px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.rejilla-contacto h3 { font-size: 1.1rem; }
+.rejilla-contacto p {
+  margin-top: 10px;
+  color: var(--tinta-suave);
+  line-height: 1.7;
+}
+
 /* =========================================================================
    Adaptación
    ========================================================================= */
@@ -583,6 +863,9 @@ a { color: inherit; }
   .hueso { color: var(--amarillo-600); }
   .hueso span { color: var(--azul-900); }
 
+  .rejilla-asesoria { grid-template-columns: repeat(2, 1fr); }
+  .rejilla-contacto { grid-template-columns: 1fr; gap: 28px; }
+  .carr-pista { --inset-pista: 22px; }
   .quien { grid-template-columns: 1fr; }
   .quien-foto { max-width: 330px; }
   .tarjetas { grid-template-columns: 1fr; gap: 16px; margin-top: 34px; }

@@ -5,7 +5,8 @@ no recibirá clientes hasta más adelante, pero la arquitectura debe permitir en
 reservas reales sin rehacerla.
 
 - Marca: **Kaótico**, eslogan **Pelos y Trufas**
-- WhatsApp: **(retirado del repositorio)** (Colombia)
+- WhatsApp: **no vive en el repositorio.** El enlace apunta a `wa.me/` sin
+  destinatario hasta que el dueño dé el visto bueno al proyecto.
 - Servicios: estética canina (el fuerte), guardería esporádica, venta de alimentación y vacunas
 
 ---
@@ -49,8 +50,14 @@ Decisiones que costaron medirlas y **no conviene deshacer sin releer esto**:
 
 ### Secciones
 
-`site/index.html` — hero a pantalla completa, "Quién soy" y "Servicios" escritos.
-`#productos`, `#agenda` y `#contacto` están esbozados con avisos visibles de pendiente.
+`site/index.html` — hero, "Quién soy", "Servicios", "Asesorías", "Productos" (carrusel),
+"Agenda" (calendario) y "Contacto". El carrusel y el calendario viven en `site/js/ui.js`.
+
+**La disponibilidad del calendario es inventada** y determinista: la misma fecha da
+siempre el mismo resultado. Está aislada en la función `ocupado()` de `ui.js` — el día
+que haya reservas reales se cambia esa función y la interfaz no se entera.
+
+**Los horarios de contacto también son inventados** (L-V 8:00-17:00, S 8:00-13:00).
 
 **`index.html` se regenera** desde `site/rebuild_index.py`,
 que también calcula los arcos del hueso. Editarlo a mano por búsqueda de índices ya
