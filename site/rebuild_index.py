@@ -181,8 +181,8 @@ __ARCOS__
         <article class="tarjeta">
           <h3>Guardería</h3>
           <p>
-            Unas horas o unos pocos días, cuando la vida se complica. Uno o dos perros a
-            la vez, para que sigan siendo huéspedes y no inventario.
+            Unas horas o unos pocos días, cuando la vida se complica. Uno o dos perros
+            a la vez.
           </p>
           <p>
             Trae su comida y lo que le dé calma: su cama, su manta, el juguete que no
