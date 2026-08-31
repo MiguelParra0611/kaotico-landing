@@ -49,8 +49,7 @@ milisegundos, que es lo que se percibe como entrecortado.
       inclinación del teléfono
 - [x] Favicon con la cara del cachorro
 - [x] Menú desplegable en móvil
-- [x] Hero móvil rehecho: el perro se funde con el azul y el texto va encima,
-      como en escritorio
+- [x] Hero móvil con la misma composición que escritorio, recortado a 16:9
 
 ### En curso
 - [ ] **Seguir puliendo los textos con la voz del dueño**, sección por sección
@@ -130,10 +129,23 @@ sobre fondo oscuro.
 
 ### En móvil el texto y el hueso quedaban fuera del hero
 El hero móvil era mitad azul, mitad blanco, y el texto caía debajo del perro en
-vez de encima como en escritorio. **Resuelto** rellenando el hero con un
-degradado que imita al del asset (colores medidos sobre él) y difuminando el
-borde inferior de la banda, para que el cuerpo del perro se funda con el azul
-en vez de cortarse a media altura.
+vez de encima. El primer intento —rellenar la pantalla de azul y difuminar al
+perro— resolvió eso pero introdujo otro problema: azul de sobra y un perro
+deshecho por abajo.
+
+**Resuelto** dejando el hero en **16:9 exacto**, atado al ancho y no a la altura
+de pantalla. A esa proporción la imagen no se recorta, así que se conserva su
+composición original: el perro a la izquierda y aire a la derecha —131 px en una
+pantalla de 390— donde cabe el hueso sin taparlo. Es la misma composición que en
+escritorio, más pequeña.
+
+Cuanto más alto es el hero, más recorta `cover` por los lados y más ancho ocupa
+el perro: por eso el hueso se montaba encima de su cara.
+
+### El texto del hueso chocaba con su propio contorno
+A tamaño móvil "¿Reservamos?" no cabe en el cuerpo del hueso y se montaba sobre
+las curvas de las puntas. **Mitigado** encogiendo la letra hasta que el choque
+desaparece. La salida limpia sería una palabra más corta.
 
 ### Capturas de móvil que mentían
 Las capturas con `--window-size=390` parecían mostrar el hueso cortado. En

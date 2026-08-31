@@ -835,61 +835,47 @@ a { color: inherit; }
   .enlaces { display: none; }
   .menu-btn { display: grid; }
 
-  /* En vertical, `cover` sobre una imagen 16:9 amplía tanto que solo se ve un
-     primer plano deformado. Así que el perro va en su propia banda arriba,
-     MÁS ANCHA QUE LA PANTALLA para que se vea grande, y el resto del hero lo
-     rellena un degradado que imita al del asset (colores medidos sobre él).
-     El borde inferior de la banda se difumina, así el cuerpo del perro se
-     funde con el azul en vez de cortarse a media altura. */
-  .hero {
-    background:
-      radial-gradient(125% 62% at 52% 26%, rgba(69, 150, 194, .92) 0%, rgba(21, 122, 185, 0) 64%),
-      linear-gradient(to bottom, #0b66a6 0%, #0e6cab 38%, #0a5892 100%);
-  }
-  .hero-lienzo {
-    inset: 0 auto auto 50%;
-    width: 150%;
-    max-width: none;
-    translate: -50% 0;
-    aspect-ratio: 16 / 9;
-    -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 99%);
-    mask-image: linear-gradient(to bottom, #000 58%, transparent 99%);
-  }
-  .hero-fondo { background-position: center top; }
+  /* El hero se recorta igual que en escritorio: la misma fórmula de `cover`,
+     solo que el cuadro es más bajo. La altura se ata al ANCHO, no a la
+     pantalla, porque es el ancho el que decide de qué tamaño sale el perro.
+     Nada de rellenar el resto de la pantalla con azul. */
+  .hero { min-height: 56.25vw; }
+  .hero-capa { min-height: 56.25vw; padding-block: 64px 14px; }
 
-  /* Solo el oscurecido de arriba, para que se lea la navegación. Abajo el
-     degradado del hero ya es bastante oscuro por sí solo. */
+  /* Oscurecidos como en escritorio: arriba para la navegación, abajo a la
+     izquierda para el titular. */
   .hero-velo {
-    inset: 0 0 auto 0;
-    height: 130px;
-    background: linear-gradient(to bottom, rgba(4, 30, 56, .50) 0%, rgba(4, 30, 56, 0) 100%);
+    inset: 0;
+    height: auto;
+    background:
+      linear-gradient(to bottom, rgba(4, 30, 56, .50) 0%, rgba(4, 30, 56, 0) 26%),
+      linear-gradient(18deg, rgba(4, 30, 56, .86) 0%, rgba(4, 30, 56, .40) 34%, rgba(4, 30, 56, 0) 60%);
   }
 
-  .hero-capa {
-    align-items: flex-end;
-    padding-block: 0 34px;
-  }
-  .hero-gancho { max-width: 26rem; }
-  .linea-1 { font-size: clamp(1.75rem, 7.4vw, 2.5rem); }
-  .linea-2 { font-size: clamp(1.1rem, 4.4vw, 1.5rem); margin-top: 10px; }
-  .linea-3 { margin-top: 14px; }
+  .hero-gancho { max-width: 20rem; }
+  .linea-1 { font-size: clamp(1.35rem, 5.9vw, 1.85rem); }
+  .linea-2 { font-size: clamp(.95rem, 3.7vw, 1.2rem); margin-top: 7px; }
+  .linea-3 { font-size: .78rem; margin-top: 9px; }
 
-  /* el hueso queda a la derecha, por debajo de donde el perro se difumina */
+  /* pequeño y a la derecha del cachorro, como en escritorio */
   .hueso-sitio {
-    --ancho-hueso: clamp(150px, 42vw, 190px);
-    top: 52%;
+    --ancho-hueso: clamp(104px, 32vw, 136px);
+    top: 50%;
     left: auto;
-    right: 18px;
+    right: 8px;
     transform: translateY(-50%);
   }
+  /* A este tamaño "¿Reservamos?" no cabe en el cuerpo del hueso y se monta
+     sobre el contorno de las puntas. Se encoge la letra hasta que el choque
+     es mínimo; la salida limpia sería una palabra más corta. */
+  .hueso span { font-size: clamp(.6rem, 2.7vw, .82rem); }
 
   /* Los textos del cuerpo van centrados en pantalla estrecha: con renglones
-     tan cortos, el borde izquierdo en zigzag se lee peor que el centrado. */
+     tan cortos, el borde izquierdo en zigzag se lee peor. La lista de "Quién
+     soy" es la excepción: son afirmaciones sueltas y se leen mejor alineadas. */
   .seccion .contenedor { text-align: center; }
   .seccion p.intro { margin-inline: auto; }
-  .lista-marcas { justify-items: center; }
-  .lista-marcas li { padding-left: 0; padding-top: 24px; }
-  .lista-marcas li::before { left: 50%; top: 6px; translate: -50% 0; }
+  .lista-marcas { text-align: left; max-width: 22rem; margin-inline: auto; }
   .quien-foto { margin-inline: auto; }
   .porque { flex-direction: column; align-items: center; text-align: center; gap: 16px; padding: 26px 24px; }
   .porque p { margin-inline: auto; }
