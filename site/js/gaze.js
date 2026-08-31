@@ -174,6 +174,74 @@ export function crearGaze(sprite, opciones = {}) {
   };
   const onLeave = () => { objetivo.x = 0; objetivo.y = 0; programar(); };
 
+  /* ------------------------------------------------------------ giroscopio
+     En un movil no hay cursor, pero si hay inclinacion. El modulo ya separa
+     "hacia donde mirar" de "como pintar", asi que basta con alimentar el mismo
+     objetivo desde otro sensor: el atlas y los ocho radios no se enteran. */
+  let quitarGiro = null;
+
+  function conectarGiroscopio() {
+    if (!("DeviceOrientationEvent" in window)) return;
+
+    const RANGO = 22;      // grados de inclinacion hasta el giro maximo
+    let base = null;       // la primera lectura fija el neutro: da igual como
+                           // sostenga el telefono cada persona
+    let pedido = false;
+
+    const onOrient = (e) => {
+      if (e.beta == null || e.gamma == null || !activo) return;
+
+      // al girar el aparato, los ejes del sensor se intercambian
+      const giro = (screen.orientation && screen.orientation.angle) || 0;
+      let ix = e.gamma, iy = e.beta;
+      if (giro === 90)  { ix =  e.beta; iy = -e.gamma; }
+      if (giro === 270) { ix = -e.beta; iy =  e.gamma; }
+
+      if (!base) base = { x: ix, y: iy };
+      const nx = clamp((ix - base.x) / RANGO, -1, 1);
+      const ny = clamp((iy - base.y) / RANGO, -1, 1);
+
+      /* El atlas grande no se descarga por tener sensor, sino cuando alguien
+         de verdad esta inclinando el aparato. Quien solo pasa scrolleando no
+         paga los 3.5 MB. */
+      if (!pedido && Math.hypot(nx, ny) > 0.18) { pedido = true; pedirAtlasAlta(); }
+
+      objetivo.x = nx;
+      objetivo.y = ny;
+      vistoPuntero = true;
+      programar();
+    };
+
+    // al cambiar de vertical a horizontal el neutro anterior deja de valer
+    const onGiroPantalla = () => { base = null; };
+
+    const arrancar = () => {
+      addEventListener("deviceorientation", onOrient, { passive: true });
+      addEventListener("orientationchange", onGiroPantalla);
+      quitarGiro = () => {
+        removeEventListener("deviceorientation", onOrient);
+        removeEventListener("orientationchange", onGiroPantalla);
+      };
+    };
+
+    /* iOS 13+ exige permiso explicito y SOLO lo concede desde un gesto del
+       usuario, asi que se pide en el primer toque. En Android no hace falta. */
+    const pedirPermiso = DeviceOrientationEvent.requestPermission;
+    if (typeof pedirPermiso === "function") {
+      const alTocar = () => {
+        pedirPermiso.call(DeviceOrientationEvent)
+          .then((r) => { if (r === "granted") arrancar(); })
+          .catch(() => {});
+      };
+      addEventListener("touchend", alTocar, { once: true, passive: true });
+    } else {
+      arrancar();
+    }
+  }
+
+  // solo donde no hay raton: en escritorio el sensor no aporta nada
+  if (matchMedia("(hover: none) and (pointer: coarse)").matches) conectarGiroscopio();
+
   addEventListener("pointermove", onMove, { passive: true });
   document.addEventListener("pointerleave", onLeave);
   programar();
@@ -183,6 +251,7 @@ export function crearGaze(sprite, opciones = {}) {
       removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerleave", onLeave);
       mqQuieto.removeEventListener("change", cambioMovimiento);
+      if (quitarGiro) quitarGiro();
       if (raf !== null) cancelAnimationFrame(raf);
     },
   };

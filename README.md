@@ -21,6 +21,10 @@ Las notas técnicas y las mediciones están en [ESTADO.md](ESTADO.md).
 Un atlas de **167 poses** (una celda central y ocho radios) indexado por el **ángulo**
 del cursor. Cambiar de pose cuesta un `background-position`.
 
+En móvil no hay cursor, pero sí inclinación: el mismo módulo se alimenta del
+**giroscopio**. Como separa *hacia dónde mirar* de *cómo pintar*, cambiar la fuente
+de entrada no toca ni el atlas ni la selección por ángulo.
+
 No es scrubbing de video, y eso es deliberado: `currentTime` es un solo número y no
 puede representar una dirección en dos ejes; además cada salto en un `<video>` cuesta
 milisegundos, que es lo que se percibe como entrecortado.
@@ -40,10 +44,15 @@ milisegundos, que es lo que se percibe como entrecortado.
 - [x] Agenda con calendario y giro de hoja al cambiar de mes
 - [x] Contacto con ubicación y horarios
 - [x] Asesorías en la navegación
+- [x] Publicado en Vercel, con despliegue automático en cada push
+- [x] **Seguimiento por giroscopio en móvil**: sin cursor, el perro sigue la
+      inclinación del teléfono
 
 ### En curso
 - [ ] **Seguir puliendo los textos con la voz del dueño**, sección por sección
 - [ ] Fotos reales del dueño y de antes/después
+- [ ] Nivel intermedio de atlas para móvil: hoy o pesa 607 KB y se ve blando,
+      o pesa 3.5 MB. Falta el punto medio
 
 ### Pendiente de decisión
 - [ ] Enlace de WhatsApp al número real (hoy apunta a `wa.me/` sin destinatario)

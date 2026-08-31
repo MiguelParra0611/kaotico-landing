@@ -43,6 +43,11 @@ Decisiones que costaron medirlas y **no conviene deshacer sin releer esto**:
   esa fórmula, el degradado de la celda deja de empalmar con el de alrededor.
 - **Los bordes laterales del sprite van difuminados un 3%.** Sin eso hay una costura
   vertical visible (medida: 5.06/255 frente a 0.79 de variación natural).
+- **En móvil entra por giroscopio**, no por puntero. La primera lectura fija el
+  neutro, así que da igual cómo se sostenga el teléfono. iOS exige permiso y solo
+  lo concede desde un gesto, por eso se pide en el primer toque; Android no.
+  El atlas pesado no se descarga por tener sensor, sino cuando alguien de verdad
+  inclina el aparato: quien pasa scrolleando no paga los 3.5 MB.
 - **En la pose de reposo el sprite se oculta** y se ve el perro del fondo, que llega
   sin trocear: 522 px de ancho real contra 325 de la celda, un 60% más de detalle
   gratis. Por eso `idle: false` — la respiración movía la pose fuera del centro y
