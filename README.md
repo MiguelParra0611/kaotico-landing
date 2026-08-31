@@ -50,6 +50,7 @@ milisegundos, que es lo que se percibe como entrecortado.
 - [x] Favicon con la cara del cachorro
 - [x] Menú desplegable en móvil
 - [x] Hero móvil con la misma composición que escritorio, recortado a 16:9
+- [x] Texto y hueso del hero móvil a escala, sin tocar al perro
 
 ### En curso
 - [ ] **Seguir puliendo los textos con la voz del dueño**, sección por sección
@@ -141,6 +142,23 @@ escritorio, más pequeña.
 
 Cuanto más alto es el hero, más recorta `cover` por los lados y más ancho ocupa
 el perro: por eso el hueso se montaba encima de su cara.
+
+### El texto del hero rozaba al perro, y estrecharlo lo empeoraba
+Con el hero ya recortado quedaba poco aire entre el titular y el pecho del
+animal. El reflejo es estrechar el bloque de texto — y es justo lo contrario de
+lo que hay que hacer.
+
+Medido a 390 px sobre dos capturas superpuestas (una solo con el perro, otra
+solo con el texto), fila a fila: entre 38vw y 50vw **el resultado es idéntico**,
+9 px de hueco, porque a esos anchos el corte de línea lo decide el propio texto
+y no el límite. A 34vw sí cambia, y a peor: entra una línea más, el bloque crece
+**hacia arriba** hasta la fila 119 —donde arranca la oreja, que solo deja
+115 px— y el hueco cae a 4 px.
+
+**Resuelto** encogiendo la letra y el hueso en vez de estrechar la caja. El
+perro deja 160-215 px libres en la franja baja y solo 103 a la altura de la
+cabeza, así que el margen se gana manteniendo el bloque **abajo**, no
+haciéndolo estrecho. Queda en 9 px a 390 px de ancho y 13 px a 430.
 
 ### El texto del hueso chocaba con su propio contorno
 A tamaño móvil "¿Reservamos?" no cabe en el cuerpo del hueso y se montaba sobre

@@ -849,26 +849,37 @@ a { color: inherit; }
     height: auto;
     background:
       linear-gradient(to bottom, rgba(4, 30, 56, .50) 0%, rgba(4, 30, 56, 0) 26%),
-      linear-gradient(18deg, rgba(4, 30, 56, .86) 0%, rgba(4, 30, 56, .40) 34%, rgba(4, 30, 56, 0) 60%);
+      linear-gradient(16deg, rgba(4, 30, 56, .72) 0%, rgba(4, 30, 56, .26) 30%, rgba(4, 30, 56, 0) 52%);
   }
 
-  .hero-gancho { max-width: 20rem; }
-  .linea-1 { font-size: clamp(1.35rem, 5.9vw, 1.85rem); }
-  .linea-2 { font-size: clamp(.95rem, 3.7vw, 1.2rem); margin-top: 7px; }
-  .linea-3 { font-size: .78rem; margin-top: 9px; }
+  /* El perro no empieza en el mismo sitio en cada fila: en la franja baja
+     deja entre 160 y 215 px libres a la izquierda, mientras que a la altura
+     de la cabeza solo deja 103. Por eso el gancho se pega al fondo del hero:
+     así cae en la franja despejada.
+
+     ESTRECHARLO NO AYUDA, al contrario. Medido a 390 px: de 38vw a 50vw el
+     resultado es idéntico -el bloque arranca en la fila 134 y deja 9 px de
+     hueco- porque a esos anchos el corte de línea lo decide el texto, no el
+     límite. Bajando a 34vw sí cambia: aparece una línea más, el bloque crece
+     HACIA ARRIBA hasta la fila 119 y se mete donde empieza la oreja, dejando
+     solo 4 px. El margen se gana acortando el bloque, no estrechándolo. */
+  .hero-gancho { max-width: 42vw; }
+  .linea-1 { font-size: clamp(.88rem, 4vw, 1.15rem); }
+  .linea-2 { font-size: clamp(.72rem, 3vw, .9rem); margin-top: 5px; }
+  .linea-3 { font-size: clamp(.56rem, 2.2vw, .68rem); margin-top: 6px; }
 
   /* pequeño y a la derecha del cachorro, como en escritorio */
   .hueso-sitio {
-    --ancho-hueso: clamp(104px, 32vw, 136px);
-    top: 50%;
+    --ancho-hueso: clamp(84px, 25vw, 108px);
+    top: 46%;
     left: auto;
-    right: 8px;
+    right: 10px;
     transform: translateY(-50%);
   }
   /* A este tamaño "¿Reservamos?" no cabe en el cuerpo del hueso y se monta
      sobre el contorno de las puntas. Se encoge la letra hasta que el choque
      es mínimo; la salida limpia sería una palabra más corta. */
-  .hueso span { font-size: clamp(.6rem, 2.7vw, .82rem); }
+  .hueso span { font-size: clamp(.5rem, 2.1vw, .66rem); }
 
   /* Los textos del cuerpo van centrados en pantalla estrecha: con renglones
      tan cortos, el borde izquierdo en zigzag se lee peor. La lista de "Quién
