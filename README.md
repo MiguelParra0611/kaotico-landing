@@ -48,6 +48,9 @@ milisegundos, que es lo que se percibe como entrecortado.
 - [x] **Seguimiento por giroscopio en móvil**: sin cursor, el perro sigue la
       inclinación del teléfono
 - [x] Favicon con la cara del cachorro
+- [x] Menú desplegable en móvil
+- [x] Hero móvil rehecho: el perro se funde con el azul y el texto va encima,
+      como en escritorio
 
 ### En curso
 - [ ] **Seguir puliendo los textos con la voz del dueño**, sección por sección
@@ -117,6 +120,27 @@ así que la pista arrancaba desplazada exactamente los 132 px del padding.
 Entrando un día 31, el mes en curso no tiene ni un hueco libre y parecía roto.
 **Resuelto** abriendo en el mes siguiente cuando el actual ya no tiene disponibilidad.
 Los días pasados tampoco se pintan como "ocupados", que no lo están.
+
+### El menú hamburguesa no abría, y encima se volvía invisible
+Nunca se implementó: era un botón sin nada detrás. Y sobre la parte blanca del
+hero móvil su fondo translúcido blanco desaparecía. **Resuelto** con un panel
+desplegable de verdad —cierra al elegir, al tocar fuera y con Escape— y
+rehaciendo el hero móvil, que ahora es azul entero y deja el botón siempre
+sobre fondo oscuro.
+
+### En móvil el texto y el hueso quedaban fuera del hero
+El hero móvil era mitad azul, mitad blanco, y el texto caía debajo del perro en
+vez de encima como en escritorio. **Resuelto** rellenando el hero con un
+degradado que imita al del asset (colores medidos sobre él) y difuminando el
+borde inferior de la banda, para que el cuerpo del perro se funda con el azul
+en vez de cortarse a media altura.
+
+### Capturas de móvil que mentían
+Las capturas con `--window-size=390` parecían mostrar el hueso cortado. En
+realidad **Chrome en Windows no baja de ~500 px de ventana**: calculaba el
+diseño a 504 px y recortaba la imagen a 390. Se comprueba leyendo `innerWidth`
+desde dentro de la página. Para capturar un ancho real hay que meterla en un
+iframe del tamaño deseado.
 
 ### No había favicon
 `/favicon.ico` daba 404 y la pestaña salía en blanco. El logo es un wordmark

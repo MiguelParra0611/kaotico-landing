@@ -66,11 +66,20 @@ HTML = '''<!doctype html>
       <a href="#contacto">Contacto</a>
     </div>
 
-    <button class="menu-btn" type="button" aria-label="Abrir menú" aria-expanded="false">
+    <button class="menu-btn" type="button" id="menu-btn"
+            aria-label="Abrir menú" aria-expanded="false" aria-controls="menu-movil">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M4 7h16M4 12h16M4 17h16"/>
       </svg>
     </button>
+  </div>
+
+  <div class="menu-movil" id="menu-movil" hidden>
+    <a href="#servicios">Servicios</a>
+    <a href="#asesorias">Asesorías</a>
+    <a href="#productos">Productos</a>
+    <a href="#agenda">Agenda</a>
+    <a href="#contacto">Contacto</a>
   </div>
 </nav>
 
@@ -414,7 +423,7 @@ __ARCOS__
 
 <script type="module">
   import { crearGaze } from "./js/gaze.js";
-  import { crearCarrusel, crearCalendario } from "./js/ui.js";
+  import { crearCarrusel, crearCalendario, crearMenu } from "./js/ui.js";
 
   crearGaze(document.getElementById("sprite"), {
     atlasLo: "assets/atlas-lo.webp",
@@ -438,6 +447,8 @@ __ARCOS__
     hoja:    document.getElementById("cal-hoja"),
     navs:    [...document.querySelectorAll(".cal-nav")],
   });
+
+  crearMenu(document.getElementById("menu-btn"), document.getElementById("menu-movil"));
 
   // La navegación se vuelve barra blanca solo cuando el hero sale de pantalla
   const nav = document.getElementById("nav");

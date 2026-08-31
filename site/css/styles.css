@@ -158,6 +158,31 @@ a { color: inherit; }
 }
 .menu-btn svg { width: 21px; height: 21px; }
 
+/* ---------- menú desplegable en pantalla estrecha ---------- */
+.menu-movil {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, .97);
+  backdrop-filter: saturate(150%) blur(14px);
+  box-shadow: 0 14px 34px rgba(10, 42, 71, .16);
+  border-top: 1px solid rgba(10, 42, 71, .08);
+  display: grid;
+  padding: 10px 22px 18px;
+}
+.menu-movil[hidden] { display: none; }
+.menu-movil a {
+  padding: 15px 4px;
+  text-decoration: none;
+  font-size: 1.05rem;
+  font-weight: 550;
+  color: var(--azul-900);
+  border-bottom: 1px solid rgba(10, 42, 71, .08);
+}
+.menu-movil a:last-child { border-bottom: 0; }
+.menu-movil a:active { color: var(--amarillo-600); }
+
 /* =========================================================================
    Hero — pantalla completa
    ========================================================================= */
@@ -811,57 +836,67 @@ a { color: inherit; }
   .menu-btn { display: grid; }
 
   /* En vertical, `cover` sobre una imagen 16:9 amplía tanto que solo se ve un
-     primer plano deformado. Aquí el perro ocupa su propia banda 16:9 arriba y
-     el texto vive debajo, sobre blanco. El conjunto sigue llenando la pantalla. */
+     primer plano deformado. Así que el perro va en su propia banda arriba,
+     MÁS ANCHA QUE LA PANTALLA para que se vea grande, y el resto del hero lo
+     rellena un degradado que imita al del asset (colores medidos sobre él).
+     El borde inferior de la banda se difumina, así el cuerpo del perro se
+     funde con el azul en vez de cortarse a media altura. */
   .hero {
-    display: flex;
-    flex-direction: column;
-    background: var(--blanco);
+    background:
+      radial-gradient(125% 62% at 52% 26%, rgba(69, 150, 194, .92) 0%, rgba(21, 122, 185, 0) 64%),
+      linear-gradient(to bottom, #0b66a6 0%, #0e6cab 38%, #0a5892 100%);
   }
   .hero-lienzo {
-    position: relative;
-    inset: auto;
-    flex: 0 0 auto;
-    width: 100%;
+    inset: 0 auto auto 50%;
+    width: 150%;
+    max-width: none;
+    translate: -50% 0;
     aspect-ratio: 16 / 9;
+    -webkit-mask-image: linear-gradient(to bottom, #000 58%, transparent 99%);
+    mask-image: linear-gradient(to bottom, #000 58%, transparent 99%);
   }
+  .hero-fondo { background-position: center top; }
+
+  /* Solo el oscurecido de arriba, para que se lea la navegación. Abajo el
+     degradado del hero ya es bastante oscuro por sí solo. */
   .hero-velo {
     inset: 0 0 auto 0;
-    height: 110px;
-    background: linear-gradient(to bottom, rgba(4, 30, 56, .55) 0%, rgba(4, 30, 56, 0) 100%);
+    height: 130px;
+    background: linear-gradient(to bottom, rgba(4, 30, 56, .50) 0%, rgba(4, 30, 56, 0) 100%);
   }
 
   .hero-capa {
-    position: relative;
-    flex: 1 1 auto;
-    min-height: 0;
-    align-items: center;
-    /* deja sitio abajo para el hueso, que va posicionado */
-    padding-block: 28px 150px;
+    align-items: flex-end;
+    padding-block: 0 34px;
   }
-  .hero-gancho { max-width: none; color: var(--azul-900); }
-  /* Sobre blanco hay que reasignar TODOS los colores del gancho: los del
-     escritorio son blancos sobre el azul del hero y aquí desaparecerían. */
-  .linea-1 { font-size: clamp(1.9rem, 7.6vw, 2.6rem); }
-  .linea-1 em { color: var(--amarillo-600); }
-  .linea-2 { color: var(--azul-700); font-size: clamp(1.15rem, 4.6vw, 1.6rem); }
-  .linea-3 { color: var(--tinta-suave); margin-top: 14px; }
+  .hero-gancho { max-width: 26rem; }
+  .linea-1 { font-size: clamp(1.75rem, 7.4vw, 2.5rem); }
+  .linea-2 { font-size: clamp(1.1rem, 4.4vw, 1.5rem); margin-top: 10px; }
+  .linea-3 { margin-top: 14px; }
 
-  /* El hueso baja abajo a la izquierda: a media altura taparía al perro.
-     El desplazamiento incluye el saliente del bulto (0.30 de la altura), para
-     que el borde real del hueso quede alineado con el texto y no se salga. */
+  /* el hueso queda a la derecha, por debajo de donde el perro se difumina */
   .hueso-sitio {
-    top: auto;
-    bottom: 7vh;
-    right: auto;
-    left: calc(22px + 68px * .30);
-    transform: none;
-    pointer-events: auto;
+    --ancho-hueso: clamp(150px, 42vw, 190px);
+    top: 52%;
+    left: auto;
+    right: 18px;
+    transform: translateY(-50%);
   }
-  /* el amarillo claro sobre blanco no llega al contraste mínimo: se oscurece
-     el trazo y el texto pasa a azul */
-  .hueso { color: var(--amarillo-600); }
-  .hueso span { color: var(--azul-900); }
+
+  /* Los textos del cuerpo van centrados en pantalla estrecha: con renglones
+     tan cortos, el borde izquierdo en zigzag se lee peor que el centrado. */
+  .seccion .contenedor { text-align: center; }
+  .seccion p.intro { margin-inline: auto; }
+  .lista-marcas { justify-items: center; }
+  .lista-marcas li { padding-left: 0; padding-top: 24px; }
+  .lista-marcas li::before { left: 50%; top: 6px; translate: -50% 0; }
+  .quien-foto { margin-inline: auto; }
+  .porque { flex-direction: column; align-items: center; text-align: center; gap: 16px; padding: 26px 24px; }
+  .porque p { margin-inline: auto; }
+  .carr-cab { justify-content: center; }
+  .prod { text-align: left; }
+  .cal { margin-inline: auto; }
+  .cal-leyenda { justify-content: center; }
 
   .rejilla-asesoria { grid-template-columns: repeat(2, 1fr); }
   .rejilla-contacto { grid-template-columns: 1fr; gap: 28px; }
@@ -869,7 +904,6 @@ a { color: inherit; }
   .quien { grid-template-columns: 1fr; }
   .quien-foto { max-width: 330px; }
   .tarjetas { grid-template-columns: 1fr; gap: 16px; margin-top: 34px; }
-  .porque { flex-direction: column; gap: 16px; padding: 26px 24px; }
 }
 
 @media (max-width: 560px) {

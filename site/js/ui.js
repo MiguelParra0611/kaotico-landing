@@ -129,3 +129,39 @@ export function crearCalendario({ titulo, rejilla, hoja, navs }) {
     pintar();
   }
 }
+
+/* -------------------------------------------------------- menú desplegable */
+
+export function crearMenu(boton, panel) {
+  if (!boton || !panel) return;
+
+  const abrir = (si) => {
+    panel.hidden = !si;
+    boton.setAttribute("aria-expanded", String(si));
+    boton.setAttribute("aria-label", si ? "Cerrar menú" : "Abrir menú");
+  };
+
+  boton.addEventListener("click", (e) => {
+    e.stopPropagation();
+    abrir(panel.hidden);
+  });
+
+  // al elegir destino el menú sobra
+  panel.addEventListener("click", (e) => {
+    if (e.target.closest("a")) abrir(false);
+  });
+
+  // tocar fuera cierra; es lo que espera cualquiera
+  document.addEventListener("click", (e) => {
+    if (!panel.hidden && !panel.contains(e.target)) abrir(false);
+  });
+
+  addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !panel.hidden) { abrir(false); boton.focus(); }
+  });
+
+  // si se ensancha la ventana el panel deja de tener sentido
+  matchMedia("(min-width: 901px)").addEventListener("change", (e) => {
+    if (e.matches) abrir(false);
+  });
+}
